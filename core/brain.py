@@ -1,7 +1,7 @@
 # core/brain.py
 from config import config
 from core.memory import Memory
-from modules import nlp  # Contoh modul
+from modules import nlp
 
 class Brain:
     def __init__(self):
@@ -10,25 +10,45 @@ class Brain:
         self.memory = Memory()
 
     def process_input(self, user_input):
-        # Di sini lo bisa tambahin logika buat proses input dari user
-        # Contoh: Pake modul NLP buat analisis input
         processed_input = nlp.analyze(user_input)
-
-        # Ambil informasi dari memory
         context = self.memory.get_context(user_input)
-
-        # Gabung input dan context, lalu kasih jawaban
         response = self.generate_response(processed_input, context)
-
-        # Simpen interaksi ke memory
         self.memory.store_interaction(user_input, response)
-
         return response
 
     def generate_response(self, processed_input, context):
-        # Logika buat generate jawaban berdasarkan input dan context
-        # Bisa pake model machine learning atau rule-based system
-        if "hello" in processed_input:
-            return f"Hello, I am {self.name} version {self.version}."
-        else:
-            return "I don't understand. Can you be more specific?"
+        # Daftar kata kunci dan responsnya
+        keywords = {
+            # Greeting
+            ("halo", "hai", "hello", "hi", "hei"): 
+                f"Halo! Saya {self.name} versi {self.version}. Ada yang bisa saya bantu?",
+            
+            # Nama
+            ("nama", "siapa kamu", "who are you", "kamu siapa"):
+                f"Nama saya {self.name}, saya adalah AI assistant versi {self.version}.",
+            
+            # Kabar
+            ("apa kabar", "how are you", "kabar"):
+                "Saya baik-baik saja, terima kasih! Bagaimana dengan kamu?",
+            
+            # Terima kasih
+            ("terima kasih", "thanks", "thank you", "makasih"):
+                "Sama-sama! Senang bisa membantu.",
+            
+            # Bye
+            ("bye", "dadah", "selamat tinggal", "goodbye"):
+                "Sampai jumpa! Semoga harimu menyenangkan!",
+            
+            # Bantuan
+            ("help", "bantuan", "tolong"):
+                "Saya bisa menjawab pertanyaan sederhana. Coba tanya nama saya atau sapa saya!",
+        }
+        
+        # Cek apakah ada kata kunci yang cocok
+        for keywords_tuple, response in keywords.items():
+            for keyword in keywords_tuple:
+                if keyword in processed_input:
+                    return response
+        
+        # Kalau nggak ada yang cocok
+        return "Maaf, saya belum mengerti. Coba tanya hal lain atau ketik 'help' untuk bantuan."
